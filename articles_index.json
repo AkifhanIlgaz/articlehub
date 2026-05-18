@@ -1,0 +1,102 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "turkish_stop": {
+          "type": "stop",
+          "stopwords": "_turkish_"
+        },
+        "turkish_stemmer": {
+          "type": "stemmer",
+          "language": "turkish"
+        },
+        "tr_synonyms": {
+          "type": "synonym_graph",
+          "synonyms": [
+            "yapay zeka, yz, ai, artificial intelligence",
+            "makine öğrenmesi, ml, machine learning",
+            "yazılım, software",
+            "girişim, startup"
+          ]
+        },
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20
+        }
+      },
+      "analyzer": {
+        "turkish_article": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "apostrophe",
+            "lowercase",
+            "asciifolding",
+            "turkish_stop",
+            "turkish_stemmer"
+          ]
+        },
+        "turkish_article_search": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "apostrophe",
+            "lowercase",
+            "asciifolding",
+            "tr_synonyms",
+            "turkish_stop",
+            "turkish_stemmer"
+          ]
+        },
+        "autocomplete": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding", "edge_ngram_filter"]
+        },
+        "autocomplete_search": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "turkish_article",
+        "search_analyzer": "turkish_article_search",
+        "fields": {
+          "keyword": { "type": "keyword", "ignore_above": 512 },
+          "suggest": {
+            "type": "text",
+            "analyzer": "autocomplete",
+            "search_analyzer": "autocomplete_search"
+          }
+        }
+      },
+      "slug": { "type": "keyword" },
+      "content": {
+        "type": "text",
+        "analyzer": "turkish_article",
+        "search_analyzer": "turkish_article_search",
+        "index_options": "offsets"
+      },
+      "author": {
+        "type": "text",
+        "analyzer": "turkish_article",
+        "fields": { "keyword": { "type": "keyword" } }
+      },
+      "tags": { "type": "keyword" },
+      "reading_time": { "type": "integer" },
+      "view_count": { "type": "integer" },
+      "like_count": { "type": "integer" },
+      "published_at": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      }
+    }
+  }
+}

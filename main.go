@@ -1,15 +1,36 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"os"
 
 	"github.com/elastic/go-elasticsearch/v9"
 )
 
 func main() {
-	es, err := elasticsearch.New(elasticsearch.WithAddresses("http://localhost:9200"))
+	es, err := connectToES()
 	if err != nil {
 		panic(err)
+	}
+
+	file, err := os.Open("articles_index.json")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	repo := NewArticleRepository(es)
+	err = repo.EnsureIndex(context.Background(), "articles", file)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+func connectToES() (*elasticsearch.Client, error) {
+	es, err := elasticsearch.New(elasticsearch.WithAddresses("http://localhost:9200"))
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := es.Info()
@@ -18,5 +39,5 @@ func main() {
 	}
 	defer res.Body.Close()
 
-	fmt.Println(res)
+	return es, nil
 }
