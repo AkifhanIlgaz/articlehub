@@ -7,8 +7,8 @@ Bir makale platformunun arama servisini ES + Go ile uçtan uca uygulayan örnek 
 - Go 1.22+
 - Elasticsearch 8.13 (Docker)
 - Kibana 8.13 (Docker)
-- [`github.com/elastic/go-elasticsearch/v8`](https://github.com/elastic/go-elasticsearch)
-- [`github.com/gin-gonic/gin`](https://github.com/gin-gonic/gin)
+- [`github.com/elastic/go-elasticsearch/v9`](https://github.com/elastic/go-elasticsearch)
+- [`github.com/gofiber/fiber/v3`](github.com/gofiber/fiber/v3)
 - [`github.com/joho/godotenv`](https://github.com/joho/godotenv)
 - [`github.com/brianvoe/gofakeit/v7`](https://github.com/brianvoe/gofakeit)
 
@@ -278,4 +278,3 @@ curl http://localhost:8080/healthz
 - [Elasticsearch Official Docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - [go-elasticsearch GitHub](https://github.com/elastic/go-elasticsearch)
 - [Kibana Dev Tools](http://localhost:5601/app/dev_tools)
-
