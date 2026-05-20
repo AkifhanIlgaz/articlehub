@@ -4,6 +4,7 @@ go 1.26.3
 
 require (
 	github.com/andybalholm/brotli v1.2.1 // indirect
+	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.9.0 // indirect
 	github.com/elastic/go-elasticsearch/v9 v9.4.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

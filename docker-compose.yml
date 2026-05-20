@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
     container_name: articlehub-es
     environment:
       - discovery.type=single-node
@@ -11,13 +11,14 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.0
+    image: docker.elastic.co/kibana/kibana:9.0.3
     container_name: articlehub-kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
