@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/brianvoe/gofakeit"
@@ -20,35 +19,27 @@ func main() {
 		panic(err)
 	}
 
-	for range 50 {
-		article := Article{
-			ID:          gofakeit.UUID(),
-			Title:       gofakeit.Sentence(6),
-			Slug:        gofakeit.Word() + "-" + gofakeit.Word() + "-" + gofakeit.Word(),
-			Content:     gofakeit.Paragraph(3, 5, 10, " "),
-			Author:      gofakeit.Name(),
-			Tags:        []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
-			ReadingTime: gofakeit.Number(1, 15),
-			ViewCount:   gofakeit.Number(0, 10000),
-			LikeCount:   gofakeit.Number(0, 1000),
-			PublishedAt: gofakeit.DateRange(
-				time.Now().AddDate(-1, 0, 0),
-				time.Now(),
-			).Format(time.RFC3339),
-		}
-
-		if err := repo.Index(context.Background(), article); err != nil {
-			panic(err)
-		}
-	}
-
-	fmt.Println("50 article indexed successfully")
-
-	articles, err := repo.GetArticle(context.Background(), "fHHRRZ4BeHoowvibMA4y")
-	if err != nil {
+	if err := repo.Seed(context.Background(), es, 50); err != nil {
 		panic(err)
 	}
-	fmt.Println("articles:", articles)
+}
+
+func fakeArticle() Article {
+	return Article{
+		ID:          gofakeit.UUID(),
+		Title:       gofakeit.Sentence(6),
+		Slug:        gofakeit.Word() + "-" + gofakeit.Word() + "-" + gofakeit.Word(),
+		Content:     gofakeit.Paragraph(3, 5, 10, " "),
+		Author:      gofakeit.Name(),
+		Tags:        []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
+		ReadingTime: gofakeit.Number(1, 15),
+		ViewCount:   gofakeit.Number(0, 10000),
+		LikeCount:   gofakeit.Number(0, 1000),
+		PublishedAt: gofakeit.DateRange(
+			time.Now().AddDate(-1, 0, 0),
+			time.Now(),
+		).Format(time.RFC3339),
+	}
 }
 
 func connectToES() (*elasticsearch.TypedClient, error) {
