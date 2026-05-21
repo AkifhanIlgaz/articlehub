@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/brianvoe/gofakeit"
@@ -19,7 +21,14 @@ func main() {
 		panic(err)
 	}
 
-	if err := repo.Seed(context.Background(), es, 50); err != nil {
+	articles, err := repo.GetPopular(context.Background(), 10)
+	if err != nil {
+		panic(err)
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(articles); err != nil {
 		panic(err)
 	}
 }
@@ -27,11 +36,11 @@ func main() {
 func fakeArticle() Article {
 	return Article{
 		ID:          gofakeit.UUID(),
-		Title:       gofakeit.Sentence(6),
-		Slug:        gofakeit.Word() + "-" + gofakeit.Word() + "-" + gofakeit.Word(),
-		Content:     gofakeit.Paragraph(3, 5, 10, " "),
+		Title:       gofakeit.HipsterSentence(6),
+		Slug:        gofakeit.HipsterWord() + "-" + gofakeit.HipsterWord() + "-" + gofakeit.HipsterWord(),
+		Content:     gofakeit.HipsterParagraph(3, 5, 10, " "),
 		Author:      gofakeit.Name(),
-		Tags:        []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
+		Tags:        []string{gofakeit.HipsterWord(), gofakeit.HipsterWord(), gofakeit.HipsterWord()},
 		ReadingTime: gofakeit.Number(1, 15),
 		ViewCount:   gofakeit.Number(0, 10000),
 		LikeCount:   gofakeit.Number(0, 1000),
