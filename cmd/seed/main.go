@@ -2,39 +2,45 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"os"
+	"flag"
+	"log"
 	"time"
 
+	"github.com/AkifhanIlgaz/articlehub/internal/model"
+	"github.com/AkifhanIlgaz/articlehub/internal/repository"
 	"github.com/brianvoe/gofakeit"
 	"github.com/elastic/go-elasticsearch/v9"
 )
 
 func main() {
-	es, err := connectToES()
+	count := flag.Int("count", 500, "number of articles to seed")
+	flag.Parse()
+
+	es, err := elasticsearch.NewTyped(elasticsearch.WithAddresses("http://localhost:9200"))
 	if err != nil {
-		panic(err)
+		log.Fatalf("elasticsearch: %v", err)
 	}
 
-	repo, err := NewArticleRepository(es)
+	repo, err := repository.New(es)
 	if err != nil {
-		panic(err)
+		log.Fatalf("repository: %v", err)
 	}
 
-	articles, err := repo.GetPopular(context.Background(), 10)
-	if err != nil {
-		panic(err)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	start := time.Now()
+	log.Printf("seeding %d articles...", *count)
+
+	if err := repo.Seed(ctx, *count, fakeArticle); err != nil {
+		log.Fatalf("seed: %v", err)
 	}
 
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(articles); err != nil {
-		panic(err)
-	}
+	log.Printf("done in %s", time.Since(start))
 }
 
-func fakeArticle() Article {
-	return Article{
+func fakeArticle() model.Article {
+	return model.Article{
 		ID:          gofakeit.UUID(),
 		Title:       gofakeit.HipsterSentence(6),
 		Slug:        gofakeit.HipsterWord() + "-" + gofakeit.HipsterWord() + "-" + gofakeit.HipsterWord(),
@@ -49,13 +55,4 @@ func fakeArticle() Article {
 			time.Now(),
 		).Format(time.RFC3339),
 	}
-}
-
-func connectToES() (*elasticsearch.TypedClient, error) {
-	es, err := elasticsearch.NewTyped(elasticsearch.WithAddresses("http://localhost:9200"))
-	if err != nil {
-		return nil, err
-	}
-
-	return es, nil
 }

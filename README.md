@@ -121,10 +121,10 @@ curl http://localhost:8080/healthz
 ## Task List
 
 ### Görev 1: Ortamı Kur
-- [ ] `articlehub/` proje klasörünü oluştur
-- [ ] `docker-compose.yml` yaz (ES single-node, security kapalı + Kibana)
-- [ ] `go mod init github.com/<kullanıcıadın>/articlehub`
-- [ ] `main.go` — ES client kur, cluster health endpoint'ine bas, response'u yazdır
+- [x] `articlehub/` proje klasörünü oluştur
+- [x] `docker-compose.yml` yaz (ES single-node, security kapalı + Kibana)
+- [x] `go mod init github.com/<kullanıcıadın>/articlehub`
+- [x] `main.go` — ES client kur, cluster health endpoint'ine bas, response'u yazdır
 - [ ] `docker compose up -d` ile her şeyi ayağa kaldır, `http://localhost:9200` ve `http://localhost:5601` erişimini doğrula
 
 > **Öğrendiklerin:** Container'lardan ES ayağa kaldırma, Kibana Dev Tools'a erişim, Go client kurma.
@@ -132,10 +132,10 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 2: Index'i Mapping ile Oluştur
-- [ ] `indexer` paketi oluştur
-- [ ] `CreateArticlesIndex()` fonksiyonunu yaz
-- [ ] Turkish custom analyzer tanımla (`turkish_stop` + `turkish_stemmer` filter)
-- [ ] `title` field'ını hem `text` hem `keyword` (multi-field) olarak tanımla
+- [x] `indexer` paketi oluştur
+- [x] `CreateArticlesIndex()` fonksiyonunu yaz (`EnsureAliasedIndex` olarak implemente edildi)
+- [x] Turkish custom analyzer tanımla (`turkish_article` + `turkish_stemmer` + `tr_synonyms` filter)
+- [x] `title` field'ını hem `text` hem `keyword` (multi-field) olarak tanımla
 - [ ] `--recreate` flag'iyle mevcut index'i silip yeniden oluştur
 - [ ] Kibana Dev Tools'ta `GET /articles/_mapping` ile mapping'i doğrula
 
@@ -144,11 +144,11 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 3: CRUD İşlemleri
-- [ ] `Article` struct'ını tanımla
-- [ ] `IndexArticle(ctx, article)` — yeni döküman ekle
-- [ ] `GetArticle(ctx, id)` — ID ile getir
-- [ ] `UpdateArticle(ctx, id, partial)` — partial update (Update API, `doc` field)
-- [ ] `DeleteArticle(ctx, id)` — sil
+- [x] `Article` struct'ını tanımla
+- [x] `IndexArticle(ctx, article)` — yeni döküman ekle (`Index` metodu)
+- [x] `GetArticle(ctx, id)` — ID ile getir
+- [x] `UpdateArticle(ctx, id, partial)` — partial update (Update API, `Doc` field)
+- [x] `DeleteArticle(ctx, id)` — sil
 - [ ] Full reindex (Index API) ile partial update (Update API) farkını dene ve anla
 - [ ] `?refresh=wait_for` parametresini test sırasında kullan
 - [ ] README'ye `if_seq_no` / `if_primary_term` ile optimistic concurrency control hakkında not ekle
@@ -158,21 +158,21 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 4: Bulk Insert ile Seed Data
-- [ ] `github.com/brianvoe/gofakeit/v7` ekle
-- [ ] Rastgele `Article` üretecek fonksiyon yaz (title, content, author, category, 1-5 tag, son 2 yıl içinde tarih, rastgele view_count)
+- [x] `github.com/brianvoe/gofakeit/v7` ekle (`gofakeit v3` kullanıldı)
+- [x] Rastgele `Article` üretecek fonksiyon yaz (`fakeArticle()` — title, author, tags, tarih, view/like count)
 - [ ] **Manuel bulk:** NDJSON formatında body oluştur, `_bulk` endpoint'ine POST et
-- [ ] **BulkIndexer:** `esutil.BulkIndexer` ile goroutine'lerle paralel index'le
+- [x] **BulkIndexer:** `esutil.BulkIndexer` ile goroutine'lerle paralel index'le (`Seed` metodu)
 - [ ] 500 dökümanın index'lenme süresini yazdır, iki yöntemi karşılaştır
-- [ ] Bazı dökümanlar başarısız olursa hata yönetimini handle et
+- [x] Bazı dökümanlar başarısız olursa hata yönetimini handle et (`OnFailure` callback)
 
 > **Öğrendiklerin:** Bulk API'nin NDJSON formatı, throughput optimizasyonu, BulkIndexer ile concurrent indexing.
 
 ---
 
 ### Görev 5: Arama — Temel Query'ler
-- [ ] `SearchByTitle(q string)` — `match` query, sadece `title`
-- [ ] `SearchMultiField(q string)` — `multi_match`, `title^3` + `content`
-- [ ] `SearchExactTag(tag string)` — `term` query, `tags` field (keyword)
+- [x] `SearchByTitle(q string)` — `match` query, sadece `title`
+- [x] `SearchMultiField(q string)` — `multi_match`, `title^3` + `content` (`FullTextSearch` metodu)
+- [x] `SearchExactTag(tag string)` — `terms` query, `tags` field (keyword) (`GetByTags` metodu)
 - [ ] `SearchByCategoryAndDateRange(cat string, from, to time.Time)` — `bool` query: `filter` içinde `term` (category) + `range` (published_at)
 - [ ] `FuzzySearch(q string)` — `match` query, `fuzziness: "AUTO"` ("elasitc" → "elastic")
 - [ ] Her fonksiyon için en az 2 test case'i README'ye ekle
@@ -183,13 +183,13 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 6: Pagination, Sorting, Highlighting
-- [ ] `from`/`size` ile basit sayfalama
-- [ ] `search_after` ile derin sayfalama
+- [x] `from`/`size` ile basit sayfalama (`ListPaginated` metodu)
+- [ ] `search_after` ile derin sayfalama (`SearchAfter` stub'ı oluşturuldu)
 - [ ] README'de farkı açıkla: `from + size > 10.000` neden hata verir, `search_after` neden tercih edilir
-- [ ] `published_at` ile azalan/artan sıralama
-- [ ] `view_count` ile azalan sıralama
+- [x] `published_at` ile azalan/artan sıralama (`ListPaginated` — sortField/sortOrder parametresi)
+- [x] `view_count` ile azalan sıralama (`ListPaginated` — sortField/sortOrder parametresi)
 - [ ] Score ile ikincil sıralama dene
-- [ ] Highlighting: eşleşen kelimeleri `<em>` ile sar, `pre_tags`/`post_tags` ile özelleştir
+- [ ] Highlighting: eşleşen kelimeleri `<em>` ile sar, `pre_tags`/`post_tags` ile özelleştir (`SearchWithHighlight` stub'ı oluşturuldu)
 
 > **Öğrendiklerin:** Pagination stratejileri ve sınırları, sort kombinasyonları, highlighting.
 
@@ -220,10 +220,10 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 9: Autocomplete / Suggestions
-- [ ] **Completion suggester:** Mapping'e `suggest` adında `completion` type field ekle, bulk insert sırasında doldur
+- [ ] **Completion suggester:** Mapping'e `suggest` adında `completion` type field ekle, bulk insert sırasında doldur (`SuggestCompletion` stub'ı oluşturuldu)
 - [ ] `GET /suggest?q=` endpoint'ini completion suggester ile implement et
-- [ ] **Edge n-gram analyzer:** `el`, `ela`, `elas`, `elast`... prefix'lerini index'leyen custom analyzer yaz
-- [ ] Edge n-gram ile arama yapan alternatif endpoint veya flag ekle
+- [x] **Edge n-gram analyzer:** `autocomplete` ve `autocomplete_search` analyzer `articles_index.json`'da tanımlı
+- [x] Edge n-gram ile arama yapan alternatif endpoint veya flag ekle (`SuggestTitle` — `title.suggest` field)
 - [ ] README'de iki yaklaşımı karşılaştır: ne zaman hangisi tercih edilir?
 
 > **Öğrendiklerin:** Suggester API, n-gram analyzer, UX odaklı ES konfigürasyonu.
@@ -231,14 +231,14 @@ curl http://localhost:8080/healthz
 ---
 
 ### Görev 10: Alias ve Reindex (Zero-Downtime Migration)
-- [ ] Index'i `articles_v1` adıyla oluştur, üstüne `articles` alias'ı bağla
-- [ ] Tüm kodun alias'ı (`articles`) kullansın — direkt index adı olmasın
+- [x] Index'i `articles_v1` adıyla oluştur, üstüne `articles` alias'ı bağla (`EnsureAliasedIndex`)
+- [x] Tüm kodun alias'ı (`articles`) kullansın — `articlesAlias` const kullanılıyor
 - [ ] Bir mapping değişikliği yap (yeni field ekle veya analyzer değiştir)
-- [ ] `articles_v2` index'ini yeni mapping ile oluştur
-- [ ] `_reindex` API'si ile v1'den v2'ye kopyala
-- [ ] Alias'ı atomik olarak v1'den çıkar, v2'ye bağla (tek istekte, downtime sıfır)
-- [ ] `articles_v1`'i sil
-- [ ] Bu akışı `migrate.go` script'i olarak yaz
+- [ ] `articles_v2` index'ini yeni mapping ile oluştur (`cmd/migrate/main.go` stub'ı oluşturuldu)
+- [x] `_reindex` API'si ile v1'den v2'ye kopyala (`indexer.reindex` metodu mevcut)
+- [x] Alias'ı atomik olarak v1'den çıkar, v2'ye bağla (`indexer.swapAlias` — tek `_aliases` isteği)
+- [ ] `articles_v1`'i sil (`cmd/migrate/main.go` stub'ında yer alacak)
+- [ ] Bu akışı `migrate.go` script'i olarak yaz (`cmd/migrate/main.go` stub'ı oluşturuldu)
 - [ ] README'de "Zero-Downtime Migration" başlığı altında açıkla
 
 > **Öğrendiklerin:** Alias yönetimi, reindex, zero-downtime deployment — seni junior'lar arasından ayıran konu.
